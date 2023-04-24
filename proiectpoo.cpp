@@ -257,7 +257,7 @@ int main()
 			int nr;
 			cout << "Cate perechi doriti? \n";
 			cin >> nr;
-			Brand papuc("Nike", "Romania", nr);
+			Brand papuc("Adidas", "Germania", nr);
 			const char* den = papuc.get_denumire();
 			const char* loc = papuc.get_locatie();
 			int numar = papuc.get_nr_perechi();
@@ -270,7 +270,7 @@ int main()
 			    int nr;
 			    cout << "Cate perechi doriti? \n";
 			    cin >> nr;
-				Brand papuc("Nike", "Romania", nr);
+				Brand papuc("Vans", "Elvetia", nr);
 				const char* den = papuc.get_denumire();
 				const char* loc = papuc.get_locatie();
 				int numar = papuc.get_nr_perechi();
@@ -290,25 +290,31 @@ int main()
 			{
 				int p;
 				p = 500;
-				obiect.set_pret(p);
+				Incaltaminte nike;
+				nike.set_pret(p);
+				obiect = nike;
 			}
 			if (incaltare.get_denumire() == "Adidas")
 			{
 				int p;
 				p = 400;
-				obiect.set_pret(p);
+				Incaltaminte adidas;
+				adidas.set_pret(p);
+				obiect = adidas;
 			}
 			if (incaltare.get_denumire() == "Vans")
 			{
 				int p;
 				p = 300;
-				obiect.set_pret(p);
+				Incaltaminte vans;
+				vans.set_pret(p);
+				obiect = vans;
 			}
 		}
 		else
 		{
 			system("CLS");
-			cout << "Marimea cautata nu este in stoc. \n";
+			cout << "Marimea cautata nu este in stoc. Stocul disponibil pentru marimi este de la marimea 40 pana la marimea 50.  \n";
 			return 0;
 
 		}
