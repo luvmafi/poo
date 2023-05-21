@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <vector>
+#include <stdexcept>
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -10,6 +12,8 @@ class Incaltaminte;
 class Brand;
 class Angajat;
 class Cumparator;
+class Director;
+
 
 class Brand
 {
@@ -52,7 +56,7 @@ public:
 	}
 	void afisare_detalii()
 	{
-		cout << "Denumirea brand-ului: " << denumire<<endl;
+		cout << "Denumirea brand-ului: " << denumire << endl;
 		cout << "Locatia coletului: " << locatie << endl;
 		cout << "Numarul de perechi comandante: " << nr_perechi << endl;
 	}
@@ -63,6 +67,7 @@ public:
 
 class Incaltaminte
 {
+protected:
 	int marime;
 	Brand brand;
 	int pret;
@@ -138,10 +143,10 @@ public:
 
 	void set_Cumparator(char* n, char* p, char* e, char* nr)
 	{
-		if(nume!=n) nume = n;
-		if(prenume!=p) prenume = p;
-		if(email!=e) email = e;
-		if(nr_telefon!=nr) nr_telefon = nr;
+		if (nume != n) nume = n;
+		if (prenume != p) prenume = p;
+		if (email != e) email = e;
+		if (nr_telefon != nr) nr_telefon = nr;
 	}
 	friend ostream& operator<<(ostream& os, const Cumparator& client)
 	{
@@ -152,69 +157,275 @@ public:
 		return os;
 	}
 };
-class Angajat 
-{
-	char nume[30];
-	char prenume[30];
-	int cod;
-	Cumparator* cumparatori = new Cumparator [10];
-	int nrcumparatori;
+
+class Director {
+public:
+	virtual void afisareDetalii() = 0;
+	virtual double calculeazaSalariu() = 0;
+	virtual ~Director() {}
+};
+
+
+class Vanzator : public Director {
+private:
+	string nume;
+	int varsta;
+	double comision;
 
 public:
-	Angajat() : nume(), prenume(), cod(0) {}
-	Angajat(char n[30], char p[30], int  c)
-	{
-		strcpy_s(nume, strlen(n)+1, n);
-		strcpy_s(prenume,strlen(p)+1, p);
-		cod = c;
+	Vanzator(string n, int v, double c) : nume(n), varsta(v), comision(c) {}
+
+	void afisareDetalii() override {
+		cout << "Nume: " << nume << "\n";
+		cout << "Varsta: " << varsta << "\n";
+		cout << "Comision: " << comision << "\n";
 	}
 
-	int get_cod()
-	{
-		return cod;
-	}
-	char* get_nume() {
-		return nume;
-	}
-	char* get_prenume()
-	{
-		return prenume;
-	}
-	/*void set_Angajat(char* n, char* p, int c)
-	{
-		nume = n;
-		prenume = p;
-		cod = c;
-	}*/
-	void set_Cumparator(int index,char* n, char* p,char *e, char* nr)
-	{
-		cumparatori[index].set_Cumparator(n, p, e, nr);
-	}
-	void set_nrcumparatori(int nrcmp)
-	{
-		nrcumparatori = nrcmp;
-	}
-	int salariu()
-	{
-		return 1000 * nrcumparatori;
-	}
-	void afisareclienti()
-	{
-		for (int i = 0; i < nrcumparatori; ++i)
-			cout << cumparatori[i]<<" ";
-	}
-	~Angajat() {
-		delete[] cumparatori;
+	double calculeazaSalariu() override {
+		return 2000 + comision * 0.1;
 	}
 };
 
 
+class Casier : public Director {
+private:
+	string nume;
+	int varsta;
+	double salariuFix;
 
+public:
+	Casier(string n, int v, double s) : nume(n), varsta(v), salariuFix(s) {}
+
+	void afisareDetalii() override {
+		cout << "Nume: " << nume << "\n";
+		cout << "Varsta: " << varsta << "\n";
+		cout << "Salariu fix: " << salariuFix << "\n";
+	}
+
+	double calculeazaSalariu() override {
+		return salariuFix;
+	}
+};
+
+class Cos_cumparaturi
+{
+protected:
+	int nr_incaltari, nr_produse;
+	static int nr_incaltarii, nr_produsee;
+public:
+	void set_nr_incaltari(int nr)
+	{
+		nr_incaltari = nr;
+	}
+	void set_nr_incaltarii(int nr)
+	{
+		nr_incaltarii = nr;
+	}
+
+	int get_nr_incaltari()
+	{
+		return nr_incaltari;
+	}
+	void set_nr_produse(int nr)
+	{
+		nr_produse = nr;
+	}
+	void set_nr_produsee(int nr)
+	{
+		nr_produsee = nr;
+	}
+	int get_nr_produse()
+	{
+		return nr_produse;
+	}
+	static int nrincaltari()
+	{
+		return nr_incaltarii;
+	}
+	static int nrproduse()
+	{
+		return nr_produsee;
+	}
+};
+
+
+int Cos_cumparaturi::nr_incaltarii = 0;
+
+
+class Incaltaminte_Cos : virtual public Cos_cumparaturi
+{
+protected:
+	string denumire;
+	int marime;
+	int pret;
+	int pret_total_incaltaminte;
+public:
+	int get_pret()
+	{
+		return pret;
+	}
+	Incaltaminte_Cos() = default;
+	Incaltaminte_Cos(string d, int m, int p)
+	{
+		denumire = d;
+		marime = m;
+		pret = p;
+	}
+	void set_pret_total_incaltaminte(int nr)
+	{
+
+		pret_total_incaltaminte = nr;
+	}
+	int get_pret_total_incaltaminte()
+	{
+		return pret_total_incaltaminte;
+	}
+	friend ostream& operator<<(ostream& os, const vector<Incaltaminte_Cos>& v) {
+		for (const auto& incaltaminte : v) {
+			os << "Denumire: " << incaltaminte.denumire << "\n";
+			os << "Marime: " << incaltaminte.marime << "\n";
+			os << "Pret: " << incaltaminte.pret << "\n";
+		}
+		return os;
+	}
+};
+int Cos_cumparaturi::nr_produsee = 0;
+class Accesorii_incaltaminte : virtual public Cos_cumparaturi
+{
+protected:
+	string nume_produs;
+	int pret;
+	int pret_total_accesorii;
+public:
+	Accesorii_incaltaminte() = default;
+	int get_pret()
+	{
+		return pret;
+	}
+	Accesorii_incaltaminte(string n, int p)
+	{
+		nume_produs = n;
+		pret = p;
+	}
+	void set_pret_total_accesorii(int n)
+	{
+		pret_total_accesorii = n;
+	}
+	int get_pret_total_accesorii()
+	{
+		return pret_total_accesorii;
+	}
+	friend ostream& operator<<(ostream& os, const vector<Accesorii_incaltaminte>& v) {
+		for (const auto& accesorii : v) {
+			os << "Nume produs: " << accesorii.nume_produs << "\n";
+			os << "Pret: " << accesorii.pret << "\n";
+		}
+		return os;
+	}
+};
+
+class Total_Comanda : virtual public Incaltaminte_Cos, virtual public Accesorii_incaltaminte
+{
+protected:
+	int taxe_incaltaminte = 20;
+	int taxe_produse = 10;
+	int taxa_livrare = 40;
+	int pret_total_incaltaminte;
+	int pret_total_accesorii;
+	int pret_total;
+public:
+	int calcul_taxa_incaltaminte()
+	{
+		if (get_nr_incaltari() != 0)
+			return taxe_incaltaminte * get_nr_incaltari();
+	}
+	int calcul_taxa_produse()
+	{
+		if (get_nr_produse() != 0)
+			return taxe_produse * get_nr_produse();
+	}
+protected:
+	int get_pret_total()
+	{
+		int pret = 0;
+		if (get_nr_incaltari() != 0)
+			pret = pret + pret_total_incaltaminte + calcul_taxa_incaltaminte();
+		if (get_nr_produse() != 0)
+			pret = pret + pret_total_accesorii + calcul_taxa_produse();
+		pret_total = pret + taxa_livrare;
+		return pret_total;
+	}
+public:
+	void set_pret_total_accesorii(int nr)
+	{
+		pret_total_accesorii = nr;
+	}
+	void set_pret_total_incaltaminte(int nr)
+	{
+		pret_total_incaltaminte = nr;
+	}
+	void afisare_comanda()
+	{
+		cout << "Totalul comenzii dumneavoastra este: " << get_pret_total() << "\n";
+	}
+
+};
+
+class Angajat {
+private:
+	string nume;
+	string parola;
+
+public:
+	Angajat(const string& nume) : nume(nume) {}
+
+	void introducereParola() {
+		try {
+			cout << "Introduceti parola: ";
+			cin >> parola;
+
+			if (parola != "proiect_poo") {
+				throw invalid_argument("Parola incorecta!");
+			}
+
+			cout << "Parola corecta. Acces permis." << endl;
+			afisareCastig(); // Upcasting
+		}
+		catch (const invalid_argument& ex) {
+			cout << "Eroare: " << ex.what() << endl;
+			throw runtime_error("Accesul este blocat.");
+		}
+	}
+
+	virtual void afisareCastig() const {
+		cout << "Castig: 0" << endl;
+	}
+};
+
+class AngajatVanzari : public Angajat {
+public:
+	AngajatVanzari(const string& nume) : Angajat(nume) {}
+
+	void afisareCastig() const override {
+		cout << "Castig in vanzari: 1000" << endl;
+	}
+};
+
+class AngajatMarketing : public Angajat {
+public:
+	AngajatMarketing(const string& nume) : Angajat(nume) {}
+
+	void afisareCastig() const override {
+		cout << "Castig in marketing: 2000" << endl;
+	}
+};
 int main()
 {
-	cout << "--- Selecteaza una dintre cele 2 optiuni. ---" << "\n";
-	cout << "1.Angajat " << "\n";
+	cout << "--- Selecteaza una dintre cele 3 optiuni. ---" << "\n";
+	cout << "1.Director " << "\n";
 	cout << "2.Cumparator " << "\n";
+	cout << "3.Gestioneaza cosul de cumparaturi." << "\n";
+	cout << "4.Angajat " << "\n";
 	int optiune;
 	cin >> optiune;
 	system("CLS");
@@ -223,7 +434,7 @@ int main()
 		cout << "Nume si prenume: \n";
 		char nume[30];
 		char prenume[30];
-		cin >> nume>>prenume;
+		cin >> nume >> prenume;
 		cout << "Numar de telefon: \n";
 		char nr[11];
 		cin >> nr;
@@ -249,11 +460,11 @@ int main()
 			const char* den = papuc.get_denumire();
 			const char* loc = papuc.get_locatie();
 			int numar = papuc.get_nr_perechi();
-			incaltare.set_Brand(den,loc,numar);
+			incaltare.set_Brand(den, loc, numar);
 		}
 
-		else if(nume_firma == 2)
-		   {
+		else if (nume_firma == 2)
+		{
 			int nr;
 			cout << "Cate perechi doriti? \n";
 			cin >> nr;
@@ -262,21 +473,21 @@ int main()
 			const char* loc = papuc.get_locatie();
 			int numar = papuc.get_nr_perechi();
 			incaltare.set_Brand(den, loc, numar);
-		   
+
 		}
 
-		    else if (nume_firma == 3)
-	 	      {
-			    int nr;
-			    cout << "Cate perechi doriti? \n";
-			    cin >> nr;
-				Brand papuc("Vans", "Elvetia", nr);
-				const char* den = papuc.get_denumire();
-				const char* loc = papuc.get_locatie();
-				int numar = papuc.get_nr_perechi();
-				incaltare.set_Brand(den, loc, numar);
-		      }
-			else {
+		else if (nume_firma == 3)
+		{
+			int nr;
+			cout << "Cate perechi doriti? \n";
+			cin >> nr;
+			Brand papuc("Vans", "Elvetia", nr);
+			const char* den = papuc.get_denumire();
+			const char* loc = papuc.get_locatie();
+			int numar = papuc.get_nr_perechi();
+			incaltare.set_Brand(den, loc, numar);
+		}
+		else {
 			cout << "Brand-ul cautat nu este in stoc.";
 			return 0;
 		}
@@ -325,48 +536,222 @@ int main()
 
 
 	}
+	if (optiune == 3)
+	{
+		Cos_cumparaturi cos;
+		vector <Incaltaminte_Cos> v;
+		vector <Accesorii_incaltaminte> v2;
+		cout << "Doriti incaltaminte?" << "\n";
+		cout << "Daca da, apasati tasta 1. " << "\n";
+		int numar_comenzi;
+		bool ok, ok1, ok2;
+		cin >> ok;
+		if (ok == 1)
+		{
+			ok1 = 1;
+			cout << "Cate perechi de incaltaminte doriti?" << "\n";
+			int ct;
+			cin >> ct;
+			system("CLS");
+
+			cos.set_nr_incaltari(ct);
+			cos.set_nr_incaltarii(ct);
+			for (int i = 1; i <= ct; ++i)
+			{
+				string denumire;
+				cout << "Denumire: " << "\n";
+				cin >> denumire;
+				int marime;
+				cout << "Marime: " << "\n";
+				cin >> marime;
+				int pret;
+				cout << "Pret: " << "\n";
+				cin >> pret;
+				Incaltaminte_Cos aux(denumire, marime, pret);
+				v.push_back(aux);
+				system("CLS");
+			}
+		}
+		cout << "Doriti accesorii pentru incalataminte? " << "\n";
+		cout << "Daca da, apasati tasta 1. " << "\n";
+		cin >> ok;
+		if (ok == 1)
+		{
+			ok2 = 1;
+			cout << "Cate accesorii pentru incaltaminte doriti? " << "\n";
+			int ct;
+			cin >> ct;
+			system("CLS");
+			cos.set_nr_produse(ct);
+			cos.set_nr_produsee(ct);
+			for (int i = 1; i <= ct; ++i)
+			{
+				string nume;
+				cout << "Nume produs: " << "\n";
+				cin >> nume;
+				int pret;
+				cout << "Pretul produsului: " << "\n";
+				cin >> pret;
+				Accesorii_incaltaminte aux(nume, pret);
+				v2.push_back(aux);
+				system("CLS");
+			}
+
+		}
+		if (ok1 == 1 && ok2 == 0)
+		{
+			cout << "In cosul de cumparaturi s-au regasit doar incaltaminte.\n";
+			cout << "Comanda dumneavostra este urmatoarea: \n";
+			cout << v << '\n';
+			system("CLS");
+		}
+		if (ok1 == 0 && ok2 == 1)
+		{
+			cout << "In cosul de cumparaturi s-au regasit doar accesorii pentru incaltaminte.\n";
+			cout << "Comanda dumneavoastra este urmatoarea: \n";
+			cout << v2 << "\n";
+			system("CLS");
+		}
+		if (ok1 == 1 && ok2 == 1)
+		{
+			cout << "Cosul de cumparaturi arata astfel: \n";
+			cout << "-----Incaltaminte----- \n";
+			cout << v << '\n';
+			cout << "-----Accesorii de incaltaminte----- \n";
+			cout << v2 << "\n";
+		}
+		Incaltaminte_Cos incal;
+		Accesorii_incaltaminte acces;
+
+		Total_Comanda comanda;
+		int p1, p2;
+		int pret_t = 0;
+		int cate;
+		cate = cos.get_nr_incaltari();
+		for (int i = 0; i < cate; ++i)
+			pret_t = pret_t + v[i].get_pret();
+		if (cos.get_nr_incaltari() >= 10)
+		{
+			cout << "Felicitari, beneficiati de o reducere de 10% deoarece ati cumparat cel putin 10 perechi!\n";
+			pret_t = pret_t - pret_t * 10 / 100;
+		}
+		incal.set_pret_total_incaltaminte(pret_t);
+		pret_t = 0;
+		for (int i = 0; i < cos.get_nr_produse(); ++i)
+			pret_t = pret_t + v2[i].get_pret();
+		if (cos.get_nr_produse() >= 5)
+		{
+			cout << "Felicitari, beneficiati de o reducere de 20% deoarece ati cumparat cel putin 5 accesorii pentru incaltaminte!\n";
+			pret_t = pret_t - pret_t * 20 / 100;
+		}
+		acces.set_pret_total_accesorii(pret_t);
+		comanda.set_pret_total_accesorii(acces.get_pret_total_accesorii());
+		comanda.set_pret_total_incaltaminte(incal.get_pret_total_incaltaminte());
+		comanda.afisare_comanda();
+		system("CLS");
+	}
 	if (optiune == 1)
 	{
-		cout << "Nume si prenume: \n";
-		char numeangajat[30];
-		char  prenumeangajat[30];
-		cin >> numeangajat >> prenumeangajat;
-		cout << "Cod angajat: ";
-		int nrangajat;
-		cin >> nrangajat;
-		Angajat angajat(numeangajat, prenumeangajat, nrangajat);
-		if (angajat.get_cod() == 21)
+		cout << "Pentru a afisa detaliile despre angajtii magazinului apasati tasta 1.\n";
+		bool ok;
+		cin >> ok;
+		if (ok == 1)
 		{
 			system("CLS");
-			cout << "Codul introdus este corect. Bine ai venit "<<angajat.get_nume()<<" "<<angajat.get_prenume()<<"!\n";
-			int nrcump;
-			cout << "Introdu numarul de persoane pe care le-ai asistat: ";
-			cin >> nrcump;
-			angajat.set_nrcumparatori(nrcump);
-			cout << "Te rog introdu datele persoanelor (nume, prenume, email, numar de telefon): ";
-			char numecump[30], prenumecump[30], emailcump[30], nrtelefon[30];
-			for (int i = 0; i < nrcump; i++)
-			{
-				cin >> numecump >> prenumecump >> emailcump >> nrtelefon;
-				angajat.set_Cumparator(i, numecump, prenumecump, emailcump, nrtelefon);
+			vector <Director*> angajati;
 
+			Director* vanzator = new Vanzator("Alex", 28, 500);
+			Director* casier = new Casier("Maria", 35, 3000);
+
+			angajati.push_back(vanzator);
+			angajati.push_back(casier);
+
+			for (const auto& angajat : angajati) {
+				angajat->afisareDetalii();
+				cout << "Salariu: " << angajat->calculeazaSalariu() << "\n";
+				cout << "-------------------\n";
 			}
-			system("CLS");
-			cout << "Pentru fiecare client pe ziua de azi ai castigat: " << angajat.salariu()<<"\n";
-			cout << "Clientii din ziua de azi: \n";
-			angajat.afisareclienti();
 
+			for (const auto& angajat : angajati) {
+				delete angajat;
+			}
+		}
+	}
+	if (optiune == 4)
+		try {
+		Angajat* angajat = nullptr;
+		string nume;
+
+		cout << "Introduceti numele angajatului: ";
+		cin >> nume;
+
+		cout << "--- Selectati un departament ---" << endl;
+		cout << "1. Vanzari" << endl;
+		cout << "2. Marketing" << endl;
+		int optiunee;
+		cin >> optiunee;
+		system("CLS");
+		if (optiunee == 1) {
+			angajat = new AngajatVanzari(nume);
+		}
+		else if (optiunee == 2) {
+			angajat = new AngajatMarketing(nume);
 		}
 		else {
-			system("CLS");
-			cout << "Codul este gresit. Acces interzis!";
-			return 0;
+			throw invalid_argument("Optiune invalida!");
 		}
 
-	}
-	 return 0;
+		angajat->introducereParola();
 
+		delete angajat;
+	}
+	catch (const exception& ex) {
+		cout << "Eroare: " << ex.what() << endl;
+		cout << "Programul se inchide." << endl;
+		return 0;
+	}
+	return 0;
 }
 
 
-/*NU INTELEG DE CE DE LA AFISAREA LA LINIA 350 DA OVERWRITE LA TOT VECTORUL */
+
+/*NU INTELEG DE CE DE LA AFISAREA LA LINIA 350 DA OVERWRITE LA TOT V/*
+CERINTE PROIECT DE BIFAT
+FARA DATE PUBLICE !!!!
+
+MOSTENIRE                     2p
+-minim 2 ierarhii de mostenire(bazele si clasa urm diferite)  nush                      |
+-minim 2 modificatori de acces   facuta                                                     |
+-o clasa cu mostenire multipla        facuta                                             |             2p
+-cel pu?in o dat? un constructor (cu parametri) dintr-o clas? de baz?, am               |
+folosind o list? de ini?ializare în constructorul clasei copil        am                |
+-minim 2 date membru si o meteoda sa fie protected   da                                  |
+
+VIRTUAL                    2p
+-minim o interfata(clasa doar cu metode virtuale si destructor virtual am           |
+-minim o clasa de baza abstracta             am                                     |
+-trebuie folosit destructor virtual            am                                   |
+-2 metode virtuale supreascrise in mostenire  tratare udare am
+
+POLIMORFISM LA EXECUTIE                    2p
+-minim 2 locuri cu polimorfism la exec(prin pointeri)                      |
+-2 instante de upcasting                                                   |          1.5
+-1 downcast                                                                |posivil doar ca nu are foarte mult sens dar o sa vad
+
+EXCEPTII             2p
+-minim 1 tip  de exceptie custom                                                                              |
+-exceptii in minim 2 functii/ metode           1
+-minim un try...catch care sa prinda o eroare facuta intentionat, si sa o rezolve intr-un fel                 |  1p
+-1 try....catch care sa prinda o exceptie, sa o proceseze si sa rearunce un alt tip de exeptie din catch
+
+VARIABILE SI METODE STATICE                1p
+-minim 1 variabila statica    da                                             |  FACUT    1p
+-cel putin 2 metode statice(macar 1 sa foloseasca variabila de sus) da      |
+
+BONUS   2p
+mostenire in diamant                     da                          |
+utilizarea unei lambda expresii
+
+oficiu 1p
+TOTAL 9.5p
+*/
